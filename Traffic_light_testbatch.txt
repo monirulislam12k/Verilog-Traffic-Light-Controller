@@ -1,0 +1,46 @@
+
+`timescale 1ns/1ps
+
+module traffic_light_tb;
+
+    // Testbench signals
+    reg clk;
+    reg rst;
+
+    wire red;
+    wire green;
+    wire yellow;
+
+    // Connect the design under test
+    traffic_light dut (
+        .clk(clk),
+        .rst(rst),
+        .red(red),
+        .green(green),
+        .yellow(yellow)
+    );
+
+    // Generate a 10 ns clock
+    initial clk = 0;
+    always #5 clk = ~clk;
+
+    // Apply reset and observe the controller
+    initial begin
+        $dumpfile("traffic_light.vcd");
+        $dumpvars(0, traffic_light_tb);
+
+        $monitor(
+            "time=%0t rst=%b | R=%b G=%b Y=%b",
+            $time, rst, red, green, yellow
+        );
+
+        rst = 1;
+        #12 rst = 0;
+
+        // Allow several clock edges
+        #40;
+
+        $finish;
+    end
+
+endmodule
